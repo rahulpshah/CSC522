@@ -26,12 +26,12 @@ with open(filename_input,'r') as fin:
 			if (line_split[0] == doc):
 				if(flag==False):
 					sys.stdout.write(',')
-				sys.stdout.write('(' + line_split[1]+','+line_split[2]+')')
+				sys.stdout.write('(' + line_split[1]+';'+line_split[2]+')')
 				flag = False
 			else:  #first line of next doc
 				sys.stdout.write('}\n')
 				sys.stdout.write(line_split[0]+':{')
-				sys.stdout.write('(' + line_split[1]+','+line_split[2]+')')
+				sys.stdout.write('(' + line_split[1]+';'+line_split[2]+')')
 				doc = line_split[0]
 	sys.stdout.write('}')
 				
