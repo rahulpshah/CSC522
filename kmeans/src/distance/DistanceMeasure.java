@@ -18,14 +18,14 @@ public class DistanceMeasure {
 				numerator += vec1.get(t) * vec2.get(t);
 				
 			}
-			magnitudeA += t^2;
+			magnitudeA += t*t;
 			
 		}
 		magnitudeA = Math.sqrt(magnitudeA);
 		
 		for(int t : vec2.keySet())
 		{
-			magnitudeB += t^2;
+			magnitudeB += t*t;
 		}
 		magnitudeB = Math.sqrt(magnitudeB);
 		

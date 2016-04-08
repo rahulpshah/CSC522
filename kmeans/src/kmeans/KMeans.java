@@ -37,7 +37,6 @@ public class KMeans extends Configured implements Tool
 		    InputStream  is = hdfs.open(inputPath);
 		    OutputStream os = hdfs.create(file);
 		    int k = 3;
-		    conf.set("k","3");
 		    BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		    //SequenceFile.Writer x = SequenceFile.createWriter(null,null,null);
 		    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -67,7 +66,6 @@ public class KMeans extends Configured implements Tool
 	    job.setMapOutputKeyClass(Text.class);
 	    job.setMapOutputValueClass(IntWritable.class);
 	    job.setOutputKeyClass(Text.class);
-	    
 	    job.setOutputValueClass(IntWritable.class);
 	    job.setMapperClass(KMeansMapper.class);
 	    job.setCombinerClass(KMeansReducer.class);
