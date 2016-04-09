@@ -6,41 +6,42 @@ public class DistanceMeasure {
 	public double CosineMeasure(Vector A, Vector B)
 	{
 		double simMeasure=0;
-		HashMap<Integer, Integer> vec1=A.getFeatures();
-		HashMap<Integer, Integer> vec2=B.getFeatures();
-		double numerator=0;
-		double magnitudeA=1;
-		double magnitudeB=1;
-		for(int t : vec1.keySet())
+		HashMap<Long, Double> vec1=A.getFeatures();
+		HashMap<Long, Double> vec2=B.getFeatures();
+		double numerator  = 0;
+		double magnitudeA = 0;
+		double magnitudeB = 0;
+		for(long t : vec1.keySet())
 		{
+			
+			
 			if(vec2.containsKey(t))
 			{
 				numerator += vec1.get(t) * vec2.get(t);
 				
 			}
-			magnitudeA += t*t;
+			magnitudeA += vec1.get(t)*vec1.get(t);
 			
 		}
 		magnitudeA = Math.sqrt(magnitudeA);
 		
-		for(int t : vec2.keySet())
+		for(long t : vec2.keySet())
 		{
-			magnitudeB += t*t;
+			magnitudeB += vec2.get(t)*vec2.get(t);
 		}
 		magnitudeB = Math.sqrt(magnitudeB);
-		
 		simMeasure = numerator / ( magnitudeA * magnitudeB );
 		return simMeasure;
 	}
 	public double JaccardMeasure(Vector A, Vector B)
 	{
 		double simMeasure=0;
-		HashMap<Integer, Integer> vec1=A.getFeatures();
-		HashMap<Integer, Integer> vec2=B.getFeatures();
-		double commonData=0;
-		double magnitudeA=1;
-		double magnitudeB=1;
-		for(int t : vec1.keySet())
+		HashMap<Long, Double> vec1=A.getFeatures();
+		HashMap<Long, Double> vec2=B.getFeatures();
+		double commonData = 0;
+		double magnitudeA = 0;
+		double magnitudeB = 0;
+		for(long t : vec1.keySet())
 		{
 			
 			if(vec2.containsKey(t))
@@ -56,7 +57,7 @@ public class DistanceMeasure {
 			magnitudeA += vec1.get(t);
 			
 		}
-		for(int t: vec2.keySet())
+		for(long t: vec2.keySet())
 		{
 			magnitudeB += vec2.get(t);
 		}

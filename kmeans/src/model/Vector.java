@@ -2,52 +2,60 @@ package model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 public class Vector
 {
-	private int documentID;
-	private HashMap<Integer, Integer> features;
+	private long documentID;
+	private HashMap<Long, Double> features;
+	public Vector()
+	{
+		features = new HashMap<Long, Double>();
+	}
+	public Vector(HashMap<Long, Double> hm)
+	{
+		features = hm;
+		documentID = -1;
+	}
 	public Vector(String line)
 	{
 		int indexColon = line.indexOf(":");
-	    documentID = Integer.parseInt(line.substring(0, indexColon));
-	    features = new HashMap<Integer,Integer>();
+	    documentID = Long.parseLong(line.substring(0, indexColon));
+	    features = new HashMap<Long, Double>();
 	    //Getting the feature vector
-	    //System.out.println(line);
 	    line = line.substring(indexColon + 1);
-	    //System.out.println(line);
+
 		//Removing the brackets
 		line = line.substring(1, line.length()-1);
-		//System.out.println(line);
+		
 		//Document does not have any features
 		if(line.length()==0)
 		{
 			return;
 		}
-		//System.out.println("A"+line);
+		
 		//Dividing the whole feature into tuples
 		StringTokenizer tuple_tokens = new StringTokenizer(line, ",");
-		////System.out.println(tuple_tokens.);
+	
 		while(tuple_tokens.hasMoreTokens())
 		{
 			String tuple = tuple_tokens.nextToken();
 			//Removing the brackets
-			//System.out.println("**tuple"+tuple);
 			if(tuple.length()==0)
 					continue;
 			tuple = tuple.substring(1,tuple.length()-1);
 			StringTokenizer feature_tokens = new StringTokenizer(tuple,";");
-			int word_id = Integer.parseInt(feature_tokens.nextToken());
-			int count = Integer.parseInt(feature_tokens.nextToken());
+			long word_id = Long.parseLong(feature_tokens.nextToken());
+			Double count = Double.parseDouble(feature_tokens.nextToken());
 			features.put(word_id,count);
 		}
 	}
-	public HashMap<Integer, Integer> getFeatures()
+	public HashMap<Long, Double> getFeatures()
 	{
 		return features;
 	}
 	
-	public int getDocumentID()
+	public long getDocumentID()
 	{
 		return documentID;
 	}
@@ -55,13 +63,39 @@ public class Vector
 	@Override
 	public String toString()
 	{
-		String s  = "";
-		for(Map.Entry<Integer,Integer> entry: features.entrySet())
+		String s  = ""+documentID+":{";
+		for(Map.Entry<Long,Double> entry: features.entrySet())
 		{
-			s+="("+entry.getKey()+","+entry.getValue()+"),";
+			s+="("+entry.getKey()+";"+entry.getValue()+"),";
 		}
+		if(s.charAt(s.length()-1) == ',')
+			s = s.substring(0, s.length()-1);
+		s += "}";
 		return s;
 	}
-
+	public void add(Vector v)
+	{
+		HashMap<Long, Double> hm = v.features;
+		
+		for(Map.Entry<Long, Double> entry: hm.entrySet())
+		{
+			long key = entry.getKey();
+			if(features.containsKey(key))
+			{
+				features.put(key, hm.get(key) + features.get(key));
+			}
+			else
+			{
+				features.put(key, hm.get(key));
+			}
+		}
+	}
+	public void divideByK(long n)
+	{
+		for(Entry<Long, Double> entry: features.entrySet())
+		{
+			features.put(entry.getKey(), entry.getValue()/n);
+		}
+	}
 	
 }

@@ -17,9 +17,8 @@ import distance.DistanceMeasure;
 import model.Cluster;
 import model.Vector;
 
-public class KMeansMapper extends Mapper<LongWritable, Text, Text, IntWritable> 
+public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text> 
 {
-	//ArrayList<Cluster> clusters;
 	Cluster clusters[];
 	String name;
 	@Override
@@ -29,42 +28,43 @@ public class KMeansMapper extends Mapper<LongWritable, Text, Text, IntWritable>
 		{
 			URI[] uris = context.getCacheFiles();
 			FileSystem hdfs = FileSystem.get(context.getConfiguration());
-			int k = Integer.parseInt(context.getConfiguration().get("k"));
+			int k = 4;
 			clusters = new Cluster[k];
 			InputStream fs = hdfs.open(new Path(uris[0]));
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 			String vector_string="";
-			int i = 0;
+			int cluster_id = 0;
 			while((vector_string=br.readLine())!=null)
 			{
-				Vector v = new Vector(vector_string);
-				clusters[i] = new Cluster(v);
-				i++;
+				String st[] = vector_string.split(" ");
+				cluster_id = Integer.parseInt(st[0]);
+				Vector v = new Vector(st[1]);
+				clusters[cluster_id] = new Cluster(v);
 			}
-			//System.out.println(clusters.size());
 		}
 	}
 	@Override
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		String line = value.toString();
 		Vector v = new Vector(line);
-		System.out.println(v.toString());
-		double minDist = 0;
+		System.out.println("Vector v:"+line);
+		
+		
+		DistanceMeasure dm = new DistanceMeasure();
 		int bestCluster = 0;
+		double maxDist = 0;
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
-			System.out.println(c.getMean());
-			DistanceMeasure dm = new DistanceMeasure();
+			System.out.println("Cluster with mean:"+c.getMean());
+			System.out.println("Distance between " + c.getMean().toString() + " and " + v.toString());
 			double dist = dm.CosineMeasure(c.getMean(), v);
 			System.out.println(dist);
-			if(minDist > dist)
+			if(maxDist < dist)
 			{
 				bestCluster = i;
 			}
 		}
-		IntWritable one = new IntWritable(1);
-		context.write(new Text("rahu;"), one);
-
+		context.write(new IntWritable(bestCluster), new Text(v.toString()));
 	}
 }
