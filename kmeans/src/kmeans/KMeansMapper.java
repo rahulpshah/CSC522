@@ -48,16 +48,14 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		String line = value.toString();
 		Vector v = new Vector(line);
 		System.out.println("Vector v:"+line);
-		
-		
 		DistanceMeasure dm = new DistanceMeasure();
 		int bestCluster = 0;
 		double maxDist = 0;
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
-			System.out.println("Cluster with mean:"+c.getMean());
-			System.out.println("Distance between " + c.getMean().toString() + " and " + v.toString());
+			System.out.println("Cluster with mean:" + c.getMean());
+			System.out.println("Distance between "  + c.getMean().toString() + " and " + v.toString());
 			double dist = dm.CosineMeasure(c.getMean(), v);
 			System.out.println(dist);
 			if(maxDist < dist)

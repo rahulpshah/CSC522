@@ -40,14 +40,13 @@ public class KMeans extends Configured implements Tool
 		    for(int i=0;i<k;i++)
 		    {
 		    	String s = br.readLine();
-		    	bw.write(""+i+" "+s+"\n");
+		    	bw.write(i+" "+s+"\n");
 		    }
 		    bw.close();
-		    ToolRunner.run(conf, new KMeans(), args);
 		    
+		    ToolRunner.run(conf, new KMeans(), args);
 		    is = hdfs.open(new Path(args[1]));
 		    br = new BufferedReader(new InputStreamReader(is));
-		    System.out.println(br.readLine());
 	    
 	  }
 	  public int run(String[] args) throws Exception 
