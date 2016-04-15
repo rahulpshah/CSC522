@@ -9,6 +9,10 @@ import model.Vector;
 
 public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
 
+	public static enum Counter
+	{
+		CONVERGED
+	}
 	@Override
 	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
 	{
@@ -27,17 +31,9 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 			mean.add(v);
 			docs = docs.append(v.getDocumentID()+",");
 			count++;
-		}/*
-		if(docs.charAt(docs.length()-1)==',')
-			docs = new StringBuffer(docs.substring(docs.length()-1)).append(']');
-		else
-			docs = docs.append(']');*/
-		long debt = context.getCounter("converged", "true").getValue();
-		System.out.println(debt);
-		mean.divideByK(count);
-		String ret = mean.toString() + "&" + new String(docs);
-		System.out.println("Mean of cluster"+cluster_id+"is:"+ret);
-		
-		context.write(new IntWritable(cluster_id), new Text("rahul"));
+		}
+		String ret = mean.toString();// + "&" + new String(docs);
+		//System.out.println("Mean of cluster"+cluster_id+"is:"+ret);
+		context.write(new IntWritable(cluster_id), new Text(ret));
 	}
 }

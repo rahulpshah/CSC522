@@ -17,7 +17,7 @@ import distance.DistanceMeasure;
 import model.Cluster;
 import model.Vector;
 
-public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text> 
+public class KMeansMapper extends Mapper<LongWritable, Text, Text, Text> 
 {
 	Cluster clusters[];
 	String name;
@@ -51,8 +51,9 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		Vector v = new Vector(line);
 		System.out.println("Vector v:"+line);
 		DistanceMeasure dm = new DistanceMeasure();
-		int bestCluster = 0;
+		String bestCluster = "";
 		double maxDist = 0;
+		
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
@@ -60,12 +61,12 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 			System.out.println(dist);
 			if(maxDist < dist)
 			{
-				bestCluster = i;
+				bestCluster = c.getMean().toString();
 				maxDist = dist;
 			}
 		}
 		context.getCounter("converged","true").increment(1);
-		context.write(new IntWritable(bestCluster), new Text(v.toString()));
+		context.write(new Text(bestCluster), new Text(v.toString()));
 	}
 	
 	
