@@ -56,7 +56,7 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
-			System.out.println(c.getMean());
+//			System.out.println(c.getMean());
 			double dist = dm.CosineMeasure(c.getMean(), v);
 //			System.out.println(dist);
 			if(maxDist < dist)

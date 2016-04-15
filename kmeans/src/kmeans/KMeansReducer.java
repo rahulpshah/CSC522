@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.HashMap;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -72,11 +73,10 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		
 		mean.divideByK(count);
 		System.out.println(mean.toString());
-		System.out.println("before " +context.getCounter(Counter.CONVERGED).getValue());
-		if(!clusters[cluster_id].getMean().equals(mean))
+
+		if(!clusters[cluster_id].getMean().getFeatures().equals(mean.getFeatures()))
 			context.getCounter(Counter.CONVERGED).increment(1);
-//		if(ret.equals(clusters[cluster_id].getMean().toString().substring(2, )))
-//		System.out.println("Mean of cluster"+cluster_id+"is:"+ret);
+
 		System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
 		context.write(new IntWritable(cluster_id), new Text(mean.toString()));
 	}
