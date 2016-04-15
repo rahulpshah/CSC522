@@ -21,6 +21,7 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 {
 	Cluster clusters[];
 	String name;
+	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException 
 	{
@@ -44,7 +45,8 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		}
 	}
 	@Override
-	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException 
+	{
 		String line = value.toString();
 		Vector v = new Vector(line);
 		System.out.println("Vector v:"+line);
@@ -54,15 +56,17 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
-			System.out.println("Cluster with mean:" + c.getMean());
-			System.out.println("Distance between "  + c.getMean().toString() + " and " + v.toString());
 			double dist = dm.CosineMeasure(c.getMean(), v);
 			System.out.println(dist);
 			if(maxDist < dist)
 			{
 				bestCluster = i;
+				maxDist = dist;
 			}
 		}
+		context.getCounter("converged","true").increment(1);
 		context.write(new IntWritable(bestCluster), new Text(v.toString()));
 	}
+	
+	
 }

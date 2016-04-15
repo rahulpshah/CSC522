@@ -20,6 +20,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
+
 public class KMeans extends Configured implements Tool
 {
 		String time = "" + System.nanoTime();
@@ -43,9 +45,9 @@ public class KMeans extends Configured implements Tool
 		    	bw.write(i+" "+s+"\n");
 		    }
 		    bw.close();
-		    
 		    ToolRunner.run(conf, new KMeans(), args);
 		    is = hdfs.open(new Path(args[1]));
+		    
 		    br = new BufferedReader(new InputStreamReader(is));
 	    
 	  }
@@ -66,7 +68,6 @@ public class KMeans extends Configured implements Tool
 	    job.setOutputKeyClass(IntWritable.class);
 	    job.setOutputValueClass(Text.class);
 	    job.setMapperClass(KMeansMapper.class);
-	    job.setCombinerClass(KMeansReducer.class);
 	    job.setReducerClass(KMeansReducer.class);
 	    return job.waitForCompletion(true) ? 0 : 1;
 	  }

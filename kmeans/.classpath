@@ -84,7 +84,6 @@
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/tools/lib/xmlenc-0.52.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/tools/lib/xz-1.0.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/tools/lib/zookeeper-3.4.6.jar"/>
-	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.18/slf4j-api-1.7.18.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/yarn/hadoop-yarn-api-2.7.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/yarn/hadoop-yarn-client-2.7.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/yarn/hadoop-yarn-common-2.7.1.jar"/>
@@ -102,6 +101,11 @@
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-2.7.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/Cellar/hadoop/2.7.1/libexec/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-2.7.1.jar"/>
-	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.18/slf4j-simple-1.7.18.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/slf4j-api-1.7.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/jcl-over-slf4j-1.7.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/jul-to-slf4j-1.7.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/log4j-over-slf4j-1.7.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/osgi-over-slf4j-1.7.21.jar"/>
+	<classpathentry kind="lib" path="/Users/Rahul/Desktop/slf4j-1.7.21/slf4j-jdk14-1.7.21.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
