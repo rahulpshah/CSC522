@@ -37,7 +37,7 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 			int cluster_id = 0;
 			while((vector_string=br.readLine())!=null)
 			{
-				String st[] = vector_string.split(" ");
+				String st[] = vector_string.split("\t");
 				cluster_id = Integer.parseInt(st[0]);
 				Vector v = new Vector(st[1]);
 				clusters[cluster_id] = new Cluster(v);
@@ -56,6 +56,7 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
+			System.out.println(c.getMean());
 			double dist = dm.CosineMeasure(c.getMean(), v);
 //			System.out.println(dist);
 			if(maxDist < dist)

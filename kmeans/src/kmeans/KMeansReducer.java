@@ -34,7 +34,7 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 			int cluster_id = 0;
 			while((vector_string=br.readLine())!=null)
 			{
-				String st[] = vector_string.split(" ");
+				String st[] = vector_string.split("\t");
 				cluster_id = Integer.parseInt(st[0]);
 				Vector v = new Vector(st[1]);
 				clusters[cluster_id] = new Cluster(v);
@@ -44,6 +44,7 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 	@Override
 	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
 	{
+		
 		//System.out.println("Cluster "+key.toString()+":");
 		//System.out.println(clusters[0].getMean());
 		int cluster_id = Integer.parseInt(key.toString());
@@ -54,13 +55,15 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		for (Text value : values) 
 		{
 			
-			//System.out.println(value.toString());
+//			System.out.println(value.toString());
 			Vector v = new Vector(value.toString());
 			mean.add(v);
 			
 			docs = docs.append(v.getDocumentID()+",");
 			count++;
-		}/*
+		}
+		mean.setDocumentID(cluster_id);
+		/*
 		if(docs.charAt(docs.length()-1)==',')
 			docs = new StringBuffer(docs.substring(docs.length()-1)).append(']');
 		else
@@ -68,11 +71,13 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		
 		
 		mean.divideByK(count);
+		System.out.println(mean.toString());
+		System.out.println("before " +context.getCounter(Counter.CONVERGED).getValue());
 		if(!clusters[cluster_id].getMean().equals(mean))
 			context.getCounter(Counter.CONVERGED).increment(1);
 //		if(ret.equals(clusters[cluster_id].getMean().toString().substring(2, )))
 //		System.out.println("Mean of cluster"+cluster_id+"is:"+ret);
-		
+		System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
 		context.write(new IntWritable(cluster_id), new Text(mean.toString()));
 	}
 }

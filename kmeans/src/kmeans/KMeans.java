@@ -9,6 +9,8 @@ import java.net.URI;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -44,7 +46,7 @@ public class KMeans extends Configured implements Tool
 		    for(int i=0;i<k;i++)
 		    {
 		    	String s = br.readLine();
-		    	bw.write(i+" "+s+"\n");
+		    	bw.write(i+"\t"+s+"\n");
 		    }
 		    bw.close();
 		    ToolRunner.run(conf, new KMeans(), args);
@@ -57,15 +59,16 @@ public class KMeans extends Configured implements Tool
 	  public int run(String[] args) throws Exception 
 	  {
 		long breakCond=1;
+		int counter=0;
 		do
 		{
 			Job job = Job.getInstance(getConf());
 			Path inputPath = new Path(args[0]);
-			String time = "" + System.nanoTime();
-		    Path outputPath = new Path(args[1]+time);
+			//String time = "" + System.nanoTime();
+		    Path outputPath = new Path(args[1]+counter);
 		    FileInputFormat.setInputPaths(job, inputPath);
 		    FileOutputFormat.setOutputPath(job, outputPath);
-		    FileSystem fs = FileSystem.get(job.getConfiguration());
+		    
 		    
 		    job.setJobName("Kmeans");
 		    job.addCacheFile(new URI("hdfs:///centers_2.txt"));
@@ -80,11 +83,24 @@ public class KMeans extends Configured implements Tool
 		    job.setReducerClass(KMeansReducer.class);
 		    job.waitForCompletion((true));
 		    
+		    FileSystem fs = FileSystem.get(job.getConfiguration());
+		    FSDataInputStream in = fs.open(new Path("hdfs://"+args[1]+counter+"/part-r-00000"));
+		    FSDataOutputStream out = fs.create(new Path("hdfs:///centers_2.txt"),true);
+		    int k = Integer.parseInt(args[2]);
+		    BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+		    for(int i=0;i<k;i++)
+		    {
+		    	String s = br.readLine();
+		    	bw.write(s+"\n");
+		    }
+		    bw.close();
 		    
 		    
 		    System.out.println(job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue());
 		    
 		    breakCond = (job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue() > 0) ? 1 : 0;
+		    counter++;
 		}
 	    while(breakCond!=0);
 	    return 0;
