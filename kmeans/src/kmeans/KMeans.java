@@ -21,6 +21,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import com.codahale.metrics.Timer.Context;
+
 
 public class KMeans extends Configured implements Tool
 {
@@ -29,8 +31,8 @@ public class KMeans extends Configured implements Tool
 	  {
 		  	
 		  	Configuration conf = new Configuration();
-		    conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/etc/hadoop/core-site.xml"));
-	        conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/etc/hadoop/hdfs-site.xml"));
+		    conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/core-site.xml"));
+	        conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/hdfs-site.xml"));
 		  	FileSystem hdfs = FileSystem.get(conf);
 		  	Path inputPath = new Path(args[0]);
 		    InputStream  is = hdfs.open(inputPath);
@@ -46,30 +48,47 @@ public class KMeans extends Configured implements Tool
 		    }
 		    bw.close();
 		    ToolRunner.run(conf, new KMeans(), args);
-		    is = hdfs.open(new Path(args[1]));
 		    
-		    br = new BufferedReader(new InputStreamReader(is));
+//		    is = hdfs.open(new Path(args[1]));
+//		    
+//		    br = new BufferedReader(new InputStreamReader(is));
 	    
 	  }
 	  public int run(String[] args) throws Exception 
 	  {
-		Job job = Job.getInstance(getConf());
-	    Path inputPath = new Path(args[0]);
-	    Path outputPath = new Path(args[1]+time);
-	    FileInputFormat.setInputPaths(job, inputPath);
-	    FileOutputFormat.setOutputPath(job, outputPath);
-	    job.setJobName("Kmeans");
-	    job.addCacheFile(new URI("hdfs:///centers_2.txt"));
-	    job.setJarByClass(KMeans.class);
-	    job.setInputFormatClass(TextInputFormat.class);
-	    job.setOutputFormatClass(TextOutputFormat.class);
-	    job.setMapOutputKeyClass(IntWritable.class);
-	    job.setMapOutputValueClass(Text.class);
-	    job.setOutputKeyClass(IntWritable.class);
-	    job.setOutputValueClass(Text.class);
-	    job.setMapperClass(KMeansMapper.class);
-	    job.setReducerClass(KMeansReducer.class);
-	    return job.waitForCompletion(true) ? 0 : 1;
+		long breakCond=1;
+		do
+		{
+			Job job = Job.getInstance(getConf());
+			Path inputPath = new Path(args[0]);
+			String time = "" + System.nanoTime();
+		    Path outputPath = new Path(args[1]+time);
+		    FileInputFormat.setInputPaths(job, inputPath);
+		    FileOutputFormat.setOutputPath(job, outputPath);
+		    FileSystem fs = FileSystem.get(job.getConfiguration());
+		    
+		    job.setJobName("Kmeans");
+		    job.addCacheFile(new URI("hdfs:///centers_2.txt"));
+		    job.setJarByClass(KMeans.class);
+		    job.setInputFormatClass(TextInputFormat.class);
+		    job.setOutputFormatClass(TextOutputFormat.class);
+		    job.setMapOutputKeyClass(IntWritable.class);
+		    job.setMapOutputValueClass(Text.class);
+		    job.setOutputKeyClass(IntWritable.class);
+		    job.setOutputValueClass(Text.class);
+		    job.setMapperClass(KMeansMapper.class);
+		    job.setReducerClass(KMeansReducer.class);
+		    job.waitForCompletion((true));
+		    
+		    
+		    
+		    System.out.println(job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue());
+		    
+		    breakCond = (job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue() > 0) ? 1 : 0;
+		}
+	    while(breakCond!=0);
+	    return 0;
+	    
 	  }
 }
 

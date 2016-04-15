@@ -50,6 +50,9 @@ public class Vector
 			features.put(word_id,count);
 		}
 	}
+	public void setDocumentID(long documentID) {
+		this.documentID = documentID;
+	}
 	public HashMap<Long, Double> getFeatures()
 	{
 		return features;
@@ -73,6 +76,8 @@ public class Vector
 		s += "}";
 		return s;
 	}
+	
+	
 	public void add(Vector v)
 	{
 		HashMap<Long, Double> hm = v.features;
@@ -97,5 +102,6 @@ public class Vector
 			features.put(entry.getKey(), entry.getValue()/n);
 		}
 	}
+
 	
 }
