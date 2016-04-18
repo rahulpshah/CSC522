@@ -1,0 +1,1 @@
+/usr/local/Cellar/hadoop/hdfs/tmp/mapred/local/1460821215899/centers_2.txt

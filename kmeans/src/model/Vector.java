@@ -78,6 +78,27 @@ public class Vector
 	}
 	
 	
+	boolean equals(Vector v)
+	{
+		HashMap<Long, Double> hm1 = v.features;
+		HashMap<Long, Double> hm2 = features;
+		if(hm1.size() != hm2.size())
+			return false;
+		double eps = 0.001;
+		for(Map.Entry<Long, Double> entry: hm1.entrySet())
+		{
+			long key = entry.getKey();
+			if(!hm2.containsKey(key))
+			{
+				return false;
+			}
+			else if(Math.abs(hm2.get(key)-hm1.get(key)) > eps)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	public void add(Vector v)
 	{
 		HashMap<Long, Double> hm = v.features;

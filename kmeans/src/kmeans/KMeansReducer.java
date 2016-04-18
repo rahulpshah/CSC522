@@ -46,9 +46,10 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
 	{
 		
-		//System.out.println("Cluster "+key.toString()+":");
-		//System.out.println(clusters[0].getMean());
+		
+		System.out.println("Cluster "+key.toString()+":");
 		int cluster_id = Integer.parseInt(key.toString());
+		System.out.println("Mean:"+clusters[cluster_id].getMean());
 		Vector mean = new Vector();
 		long count = 0;
 		
@@ -56,23 +57,17 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		for (Text value : values) 
 		{
 			
-//			System.out.println(value.toString());
+			System.out.println(value.toString());
 			Vector v = new Vector(value.toString());
 			mean.add(v);
 			
 			docs = docs.append(v.getDocumentID()+",");
 			count++;
 		}
-		mean.setDocumentID(cluster_id);
-		/*
-		if(docs.charAt(docs.length()-1)==',')
-			docs = new StringBuffer(docs.substring(docs.length()-1)).append(']');
-		else
-			docs = docs.append(']');*/
 		
 		
 		mean.divideByK(count);
-		System.out.println(mean.toString());
+		System.out.println("Mean hat is:"+mean.toString());
 
 		if(!clusters[cluster_id].getMean().getFeatures().equals(mean.getFeatures()))
 			context.getCounter(Counter.CONVERGED).increment(1);
