@@ -3,35 +3,6 @@ import java.util.HashMap;
 import model.Vector;
 
 public class DistanceMeasure {
-	public double EuclideanMeasure(Vector A, Vector B)
-	{
-		
-		HashMap<Long, Double> vec1=A.getFeatures();
-		HashMap<Long, Double> vec2=B.getFeatures();
-		
-		double x = 0; 
-		for(long t : vec1.keySet())
-		{
-			
-			
-			if(vec2.containsKey(t))
-			{
-				x += (vec1.get(t) - vec2.get(t))*((vec1.get(t) - vec2.get(t)));
-			}
-			else
-			{
-				x += (vec1.get(t))*((vec1.get(t)));
-			}
-		}
-		for(long t : vec2.keySet())
-		{
-			if(!vec1.containsKey(t))
-			{
-				x += (vec2.get(t))*((vec2.get(t)));
-			}
-		}
-		return Math.sqrt(x);
-	}
 	public double CosineMeasure(Vector A, Vector B)
 	{
 		double simMeasure=0;

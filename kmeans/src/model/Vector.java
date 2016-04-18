@@ -78,8 +78,9 @@ public class Vector
 	}
 	
 	
-	boolean equals(Vector v)
+	public boolean equals(Vector v)
 	{
+		System.out.println("asdfsdafh");
 		HashMap<Long, Double> hm1 = v.features;
 		HashMap<Long, Double> hm2 = features;
 		if(hm1.size() != hm2.size())

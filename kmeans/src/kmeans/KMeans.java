@@ -33,24 +33,28 @@ public class KMeans extends Configured implements Tool
 	  {
 		  	
 		  	Configuration conf = new Configuration();
-		    conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/etc/hadoop/core-site.xml"));
-	        conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/hdfs-site.xml"));
+		    conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/core-site.xml"));
+	        conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/hdfs-site.xml"));
 		  	FileSystem hdfs = FileSystem.get(conf);
 		  	Path inputPath = new Path(args[0]);
 		    InputStream  is = hdfs.open(inputPath);
 		    String center_path = "hdfs:///centers_2.txt";
 		    OutputStream os = hdfs.create(new Path(new URI(center_path)));
-		    int k = 4;
+		    int k = Integer.parseInt(args[2]);
 		    BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-		    
 		    for(int i=0;i<k;i++)
 		    {
 		    	String s = br.readLine();
-		    	bw.write(i+"\t"+s+"\n");
+		    	bw.write(i+"\t"+s+"\n");	
 		    }
 		    bw.close();
 		    ToolRunner.run(conf, new KMeans(), args);
+		    
+//		    is = hdfs.open(new Path(args[1]));
+//		    
+//		    br = new BufferedReader(new InputStreamReader(is));
+	    
 	  }
 	  public int run(String[] args) throws Exception 
 	  {
@@ -60,6 +64,7 @@ public class KMeans extends Configured implements Tool
 		{
 			Job job = Job.getInstance(getConf());
 			Path inputPath = new Path(args[0]);
+			//String time = "" + System.nanoTime();
 		    Path outputPath = new Path(args[1]+counter);
 		    FileInputFormat.setInputPaths(job, inputPath);
 		    FileOutputFormat.setOutputPath(job, outputPath);
@@ -81,7 +86,7 @@ public class KMeans extends Configured implements Tool
 		    FileSystem fs = FileSystem.get(job.getConfiguration());
 		    FSDataInputStream in = fs.open(new Path("hdfs://"+args[1]+counter+"/part-r-00000"));
 		    FSDataOutputStream out = fs.create(new Path("hdfs:///centers_2.txt"),true);
-		    int k = 4;
+		    int k = Integer.parseInt(args[2]);
 		    BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
 		    for(int i=0;i<k;i++)
