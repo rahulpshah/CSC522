@@ -78,7 +78,7 @@ public class Vector
 	}
 	
 	
-	public boolean equals(Vector v)
+	public boolean equalsApprox(Vector v)
 	{
 		System.out.println("asdfsdafh");
 		HashMap<Long, Double> hm1 = v.features;
