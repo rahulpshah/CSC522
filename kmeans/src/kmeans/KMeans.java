@@ -122,7 +122,7 @@ public class KMeans extends Configured implements Tool
 		job = Job.getInstance(getConf());
 		inputPath = new Path(args[1]+"FINAL_"+args[2]);
 	    outputPath = new Path("SCM_"+args[2]);
-	    FileInputFormat.setInputPaths(job, inputPath);
+	    FileInputFormat.setInputPaths(job, inputPath);	
 	    FileOutputFormat.setOutputPath(job, outputPath);
 	    job.setJobName("SCM");
 	    
@@ -136,7 +136,7 @@ public class KMeans extends Configured implements Tool
 	    job.setMapperClass(SSEMapper.class);
 	    job.setReducerClass(SSEReducer.class);
 	    job.waitForCompletion((true));
-	    return 0;	    
+	    return 0;
 	  }
 }
 

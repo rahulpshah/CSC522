@@ -55,23 +55,23 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		{
 			Vector v = new Vector(value.toString());
 			mean.add(v);
-			//docs = docs.append(value.toString()+"&");
-			docs = docs.append(v.getDocumentID()+",");
+			docs = docs.append(value.toString()+"&");
+			//docs = docs.append(v.getDocumentID()+",");
 			count++;
 		}
 		mean.setDocumentID(cluster_id);
 		mean.divideByK(count);
-		//System.out.println(mean.toString());
-		if(!clusters[cluster_id].getMean().equals(mean))
+		System.out.println(mean.toString());
+		if(!clusters[cluster_id].getMean().equalsApprox(mean))
 			context.getCounter(Counter.CONVERGED).increment(1);
 		
-		//System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
+		System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
 		
 		boolean converged = Boolean.parseBoolean(context.getConfiguration().get("converged"));
 		
 		if(!converged)
 			context.write(new IntWritable(cluster_id), new Text(mean.toString()));
 		else
-			context.write(new IntWritable(cluster_id), new Text(docs.toString()));
+			context.write(new IntWritable(cluster_id), new Text(docs.toString()+mean.toString()));
 	}
 }

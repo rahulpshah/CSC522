@@ -62,7 +62,6 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 				maxDist = dist;
 			}
 		}
-//		context.getCounter("converged","true").increment(1);
 		context.write(new IntWritable(bestCluster), new Text(v.toString()));
 	}
 	
