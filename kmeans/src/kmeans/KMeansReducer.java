@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.HashMap;
+
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Mapper.Context;
+
 
 import model.Cluster;
 import model.Vector;
@@ -27,7 +27,7 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		{
 			URI[] uris = context.getCacheFiles();
 			FileSystem hdfs = FileSystem.get(context.getConfiguration());
-			int k = 8;
+			int k = Integer.parseInt(context.getConfiguration().get("k"));
 			clusters = new Cluster[k];
 			InputStream fs = hdfs.open(new Path(uris[0]));
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
@@ -46,8 +46,6 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
 	{
 		
-		//System.out.println("Cluster "+key.toString()+":");
-		//System.out.println(clusters[0].getMean());
 		int cluster_id = Integer.parseInt(key.toString());
 		Vector mean = new Vector();
 		long count = 0;
@@ -55,29 +53,25 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		StringBuffer docs = new StringBuffer('[');
 		for (Text value : values) 
 		{
-			
-//			System.out.println(value.toString());
 			Vector v = new Vector(value.toString());
 			mean.add(v);
-			
+			//docs = docs.append(value.toString()+"&");
 			docs = docs.append(v.getDocumentID()+",");
 			count++;
 		}
 		mean.setDocumentID(cluster_id);
-		/*
-		if(docs.charAt(docs.length()-1)==',')
-			docs = new StringBuffer(docs.substring(docs.length()-1)).append(']');
-		else
-			docs = docs.append(']');*/
-		
-		
 		mean.divideByK(count);
-		System.out.println(mean.toString());
-
+		//System.out.println(mean.toString());
 		if(!clusters[cluster_id].getMean().equals(mean))
 			context.getCounter(Counter.CONVERGED).increment(1);
-
-		System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
-		context.write(new IntWritable(cluster_id), new Text(mean.toString()));
+		
+		//System.out.println("after " +context.getCounter(Counter.CONVERGED).getValue());
+		
+		boolean converged = Boolean.parseBoolean(context.getConfiguration().get("converged"));
+		
+		if(!converged)
+			context.write(new IntWritable(cluster_id), new Text(mean.toString()));
+		else
+			context.write(new IntWritable(cluster_id), new Text(docs.toString()));
 	}
 }

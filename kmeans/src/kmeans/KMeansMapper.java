@@ -29,7 +29,7 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		{
 			URI[] uris = context.getCacheFiles();
 			FileSystem hdfs = FileSystem.get(context.getConfiguration());
-			int k = 8;
+			int k = Integer.parseInt(context.getConfiguration().get("k"));
 			clusters = new Cluster[k];
 			InputStream fs = hdfs.open(new Path(uris[0]));
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
@@ -49,16 +49,13 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 	{
 		String line = value.toString();
 		Vector v = new Vector(line);
-		//System.out.println("Vector v:"+line);
 		DistanceMeasure dm = new DistanceMeasure();
 		int bestCluster = 0;
 		double maxDist = 0;
 		for(int i=0;i<clusters.length;i++)
 		{
 			Cluster c = clusters[i];
-//			System.out.println(c.getMean());
 			double dist = dm.CosineMeasure(c.getMean(), v);
-//			System.out.println(dist);
 			if(maxDist < dist)
 			{
 				bestCluster = i;

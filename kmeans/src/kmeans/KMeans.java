@@ -13,6 +13,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -23,24 +24,22 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import com.codahale.metrics.Timer.Context;
-
 
 public class KMeans extends Configured implements Tool
 {
-		String time = "" + System.nanoTime();
 	  public static void main(String args[]) throws Exception 
 	  {
 		  	
 		  	Configuration conf = new Configuration();
-		    conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/core-site.xml"));
-	        conf.addResource(new Path("/home/aniket/hadoop/etc/hadoop/hdfs-site.xml"));
+		    conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/etc/hadoop/core-site.xml"));
+	        conf.addResource(new Path("/usr/local/Cellar/hadoop/2.7.1/libexec/etc/hadoop/hdfs-site.xml"));
 		  	FileSystem hdfs = FileSystem.get(conf);
 		  	Path inputPath = new Path(args[0]);
 		    InputStream  is = hdfs.open(inputPath);
 		    String center_path = "hdfs:///centers_2.txt";
 		    OutputStream os = hdfs.create(new Path(new URI(center_path)));
 		    int k = Integer.parseInt(args[2]);
+		    
 		    BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 		    for(int i=0;i<k;i++)
@@ -50,29 +49,25 @@ public class KMeans extends Configured implements Tool
 		    }
 		    bw.close();
 		    ToolRunner.run(conf, new KMeans(), args);
-		    
-//		    is = hdfs.open(new Path(args[1]));
-//		    
-//		    br = new BufferedReader(new InputStreamReader(is));
 	    
 	  }
 	  public int run(String[] args) throws Exception 
 	  {
 		long breakCond=1;
 		int counter=0;
+		int max_iterations = Integer.parseInt(args[3]);
 		do
 		{
 			Job job = Job.getInstance(getConf());
 			Path inputPath = new Path(args[0]);
-			//String time = "" + System.nanoTime();
 		    Path outputPath = new Path(args[1]+counter);
 		    FileInputFormat.setInputPaths(job, inputPath);
 		    FileOutputFormat.setOutputPath(job, outputPath);
-		    
-		    
 		    job.setJobName("Kmeans");
 		    job.addCacheFile(new URI("hdfs:///centers_2.txt"));
 		    job.setJarByClass(KMeans.class);
+		    job.getConfiguration().set("k", args[2]);
+		    job.getConfiguration().set("converged", "false");
 		    job.setInputFormatClass(TextInputFormat.class);
 		    job.setOutputFormatClass(TextOutputFormat.class);
 		    job.setMapOutputKeyClass(IntWritable.class);
@@ -95,16 +90,53 @@ public class KMeans extends Configured implements Tool
 		    	bw.write(s+"\n");
 		    }
 		    bw.close();
-		    
-		    
 		    System.out.println(job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue());
-		    
 		    breakCond = (job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue() > 0) ? 1 : 0;
 		    counter++;
 		}
-	    while(breakCond!=0);
-	    return 0;
+		
+	    while(breakCond!=0 || counter > max_iterations);
+		
+		System.out.println("Kmeans is converged");
+		Job job = Job.getInstance(getConf());
+		Path inputPath = new Path(args[0]);
+	    Path outputPath = new Path(args[1]+"FINAL_"+args[2]);
+	    FileInputFormat.setInputPaths(job, inputPath);
+	    FileOutputFormat.setOutputPath(job, outputPath);
+	    job.setJobName("Kmeans");
+	    job.addCacheFile(new URI("hdfs:///centers_2.txt"));
+	    job.setJarByClass(KMeans.class);
+	    job.setInputFormatClass(TextInputFormat.class);
+	    job.setOutputFormatClass(TextOutputFormat.class);
+	    job.setMapOutputKeyClass(IntWritable.class);
+	    job.setMapOutputValueClass(Text.class);
+	    job.getConfiguration().set("converged", "true");
+	    job.getConfiguration().set("k", args[2]);
+	    job.setOutputKeyClass(IntWritable.class);
+	    job.setOutputValueClass(Text.class);
+	    job.setMapperClass(KMeansMapper.class);
+	    job.setReducerClass(KMeansReducer.class);
+	    job.waitForCompletion((true));
 	    
+	    System.out.println("Computing the SCM");
+		job = Job.getInstance(getConf());
+		inputPath = new Path(args[1]+"FINAL_"+args[2]);
+	    outputPath = new Path("SCM_"+args[2]);
+	    FileInputFormat.setInputPaths(job, inputPath);
+	    FileOutputFormat.setOutputPath(job, outputPath);
+	    job.setJobName("SCM");
+	    
+	    job.setJarByClass(KMeans.class);
+	    job.setInputFormatClass(TextInputFormat.class);
+	    job.setOutputFormatClass(TextOutputFormat.class);
+	    job.setMapOutputKeyClass(IntWritable.class);
+	    job.setMapOutputValueClass(DoubleWritable.class);
+	    job.setOutputKeyClass(IntWritable.class);
+	    job.setOutputValueClass(DoubleWritable.class);
+	    job.setMapperClass(SSEMapper.class);
+	    job.setReducerClass(SSEReducer.class);
+	    job.waitForCompletion((true));
+	    return 0;	    
 	  }
 }
 
