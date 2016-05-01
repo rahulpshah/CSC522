@@ -55,6 +55,7 @@ public class KMeans extends Configured implements Tool
 	  {
 		long breakCond=1;
 		int counter=0;
+		long time = System.currentTimeMillis();
 		int max_iterations = Integer.parseInt(args[3]);
 		do
 		{
@@ -94,7 +95,6 @@ public class KMeans extends Configured implements Tool
 		    breakCond = (job.getCounters().findCounter(KMeansReducer.Counter.CONVERGED).getValue() > 0) ? 1 : 0;
 		    counter++;
 		}
-		
 	    while(breakCond!=0 || counter > max_iterations);
 		
 		System.out.println("Kmeans is converged");
@@ -117,7 +117,8 @@ public class KMeans extends Configured implements Tool
 	    job.setMapperClass(KMeansMapper.class);
 	    job.setReducerClass(KMeansReducer.class);
 	    job.waitForCompletion((true));
-	    
+	    System.out.println("Time:"+(System.currentTimeMillis() - time)/1000.0);
+	    /*
 	    System.out.println("Computing the SCM");
 		job = Job.getInstance(getConf());
 		inputPath = new Path(args[1]+"FINAL_"+args[2]);
@@ -135,7 +136,7 @@ public class KMeans extends Configured implements Tool
 	    job.setOutputValueClass(DoubleWritable.class);
 	    job.setMapperClass(SSEMapper.class);
 	    job.setReducerClass(SSEReducer.class);
-	    job.waitForCompletion((true));
+	    job.waitForCompletion((true));*/
 	    return 0;
 	  }
 }

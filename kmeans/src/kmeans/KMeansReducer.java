@@ -55,8 +55,8 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		{
 			Vector v = new Vector(value.toString());
 			mean.add(v);
-			docs = docs.append(value.toString()+"&");
-			//docs = docs.append(v.getDocumentID()+",");
+			//docs = docs.append(value.toString()+"&");
+			docs = docs.append(v.getDocumentID()+",");
 			count++;
 		}
 		mean.setDocumentID(cluster_id);
@@ -72,6 +72,10 @@ public class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text>
 		if(!converged)
 			context.write(new IntWritable(cluster_id), new Text(mean.toString()));
 		else
-			context.write(new IntWritable(cluster_id), new Text(docs.toString()+mean.toString()));
+		{
+			context.write(new IntWritable(cluster_id), new Text(docs.toString()));
+			//context.write(new IntWritable(cluster_id), new Text(docs.toString() + mean.toString()));
+		}
+		
 	}
 }

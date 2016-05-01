@@ -21,7 +21,6 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 {
 	Cluster clusters[];
 	String name;
-	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException 
 	{
@@ -64,6 +63,4 @@ public class KMeansMapper extends Mapper<LongWritable, Text, IntWritable, Text>
 		}
 		context.write(new IntWritable(bestCluster), new Text(v.toString()));
 	}
-	
-	
 }
